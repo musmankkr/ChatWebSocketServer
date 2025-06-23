@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chatbot UI</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  #chat {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .message-wrapper {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 10px;
+  }
+
+  .message-wrapper.user {
+    justify-content: flex-end;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    margin: 0 10px;
+    flex-shrink: 0;
+  }
+
+  .message {
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 70%;
+    word-wrap: break-word;
+  }
+
+  .user .message {
+    background: #dcf8c6;
+  }
+
+  .bot .message {
+    background: #eeeeee;
+  }
+
+  #inputArea {
+    display: flex;
+    padding: 10px;
+    background: #ddd;
+  }
+
+  #input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+  }
+
+  #sendBtn {
+    margin-left: 10px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #sendBtn:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+</head>
+<body>
+
+  <div id="chat"></div>
+
+  <div id="inputArea">
+    <input id="input" placeholder="Type a message..." />
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('sendBtn');
+
+    const socket = new WebSocket('ws://localhost:5214/ws');
+
+    socket.onmessage = (event) => {
+      addMessage(event.data, 'bot');
+    };
+
+    sendBtn.onclick = sendMessage;
+    input.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    function sendMessage() {
+      const msg = input.value.trim();
+      if (msg) {
+        socket.send(msg);
+        addMessage(msg, 'user');
+        input.value = '';
+      }
+    }
+
+function addMessage(text, sender) {
+  const wrapper = document.createElement('div');
+  wrapper.classList.add('message-wrapper', sender);
+
+  const avatar = document.createElement('div');
+  avatar.classList.add('avatar');
+  avatar.textContent = sender === 'user' ? 'U' : 'B';
+
+  const message = document.createElement('div');
+  message.classList.add('message');
+  message.textContent = text;
+
+  if (sender === 'user') {
+    wrapper.appendChild(message);
+    wrapper.appendChild(avatar);
+  } else {
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(message);
+  }
+
+  chat.appendChild(wrapper);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+  </script>
+
+</body>
+</html>
