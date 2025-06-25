@@ -14,13 +14,7 @@ public class DialogflowService
     {
         _settings = options.Value;
 
-        var fullPath = Path.Combine(env.ContentRootPath, _settings.CredentialsPath);
-        //Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", _settings.CredentialsPath);
-
-        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", fullPath);
-        var path = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
-        Console.WriteLine($"Auth file path: {path}");
-        Console.WriteLine($"Exists: {File.Exists(path)}");
+        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", _settings.CredentialsPath);
     }
 
     public async Task<string> DetectIntentAsync(string userInput)
